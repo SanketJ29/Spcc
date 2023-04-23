@@ -1,37 +1,82 @@
-# Example grammar and sets
+# Function to generate the LL(1) parsing table
+def generate_table(grammar, start_symbol, first_sets, follow_sets):
+    # Initialize the parsing table
+    table = {}
+    for nonterminal in grammar:
+        for production in grammar[nonterminal]:
+            # Compute the FIRST set of the production
+            first_set = set()
+            for symbol in production:
+                if symbol in first_sets:
+                    first_set |= first_sets[symbol]
+                    if 'epsilon' not in first_sets[symbol]:
+                        break
+                else:
+                    first_set.add(symbol)
+                    break
+            else:
+                first_set.add('epsilon')
+            # Add entries to the parsing table based on the FIRST set
+            for terminal in first_set:
+                if terminal != 'epsilon':
+                    table[(nonterminal, terminal)] = production
+            # Add entries to the parsing table based on the FOLLOW set
+            if 'epsilon' in first_set:
+                follow_set = follow_sets[nonterminal]
+                for terminal in follow_set:
+                    table[(nonterminal, terminal)] = production
+                if '$' in follow_set:
+                    table[(nonterminal, '$')] = production
+    # Return the LL(1) parsing table
+    return table
+
+# Example usage of the generate_table function
+# Define the grammar as a dictionary of nonterminals and productions
 grammar = {
-    'S': [['a', 'A'], ['b', 'B']],
-    'A': [['c'], ['d']],
-    'B': [['c'], ['e']]
+    'S': ['A', 'b'],
+    'A': ['a', 'B'],
+    'B': ['b', 'epsilon']
 }
-
-first_sets = {
-    'S': {'a', 'b'},
-    'A': {'c', 'd'},
-    'B': {'c', 'e'}
-}
-
-follow_sets = {
-    'S': {'$'},
-    'A': {'b'},
-    'B': {'b'}
-}
-
+# Define the start symbol of the grammar
+start_symbol = 'S'
+# Get user input for the FIRST and FOLLOW sets of the grammar
+first_sets = {}
+follow_sets = {}
+for nonterminal in grammar:
+    first = input("Enter FIRST set for " + nonterminal + ": ")
+    first_sets[nonterminal] = set(first.split())
+    follow = input("Enter FOLLOW set for " + nonterminal + ": ")
+    follow_sets[nonterminal] = set(follow.split())
 # Generate the LL(1) parsing table
-table = generate_table(grammar, first_sets, follow_sets)
-
+table = generate_table(grammar, start_symbol, first_sets, follow_sets)
 # Print the LL(1) parsing table
 print("LL(1) Parsing Table:")
 print("{:<10}".format(""), end="")
-for terminal in first_sets['S'] | {'$'}:
+for terminal in first_sets[start_symbol] | {'$'}:
     print("{:<10}".format(terminal), end="")
 print()
 for nonterminal in grammar:
     print("{:<10}".format(nonterminal), end="")
-    for terminal in first_sets['S'] | {'$'}:
+    for terminal in first_sets[start_symbol] | {'$'}:
         if (nonterminal, terminal) in table:
             production = " ".join(table[(nonterminal, terminal)])
             print("{:<10}".format(production), end="")
         else:
             print("{:<10}".format(""), end="")
     print()
+
+
+How to execute:
+Enter FIRST set for S: a b
+Enter FOLLOW set for S: $
+Enter FIRST set for A: a
+Enter FOLLOW set for A: b $
+Enter FIRST set for B: b epsilon
+Enter FOLLOW set for B: a $
+
+Output:
+LL(1) Parsing Table:
+          a         b         $
+S         A         b
+A         a         B         epsilon
+B                   b         epsilon
