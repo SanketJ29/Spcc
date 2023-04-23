@@ -1,0 +1,68 @@
+import java.util.*;
+class PredictiveParser {
+	public static void main(String args[]) {
+		String var = "EFT",ter = "i+()$",table [][]={{"TF","-","TF","-","-"},{"-","+TF","-","e","e"},{"i","-","(E)","-","-"}},ip1 = "i+i$", value;
+		int i,j;
+		char ip2[] = new char[10], c1, c2;
+		ip2 = ip1.toCharArray();
+		Stack ip = new Stack();
+		for(i = ip2.length-1;i >= 0;i--)
+			ip.push(""+ip2[i]);
+		Stack stack = new Stack();
+		stack.push("$");
+		stack.push(var.charAt(0));
+		System.out.print("\nPredictive Parser / LL(1) Parser Table : \n\n\t ");
+		for(i=0;i<ter.length();i++)
+			System.out.print(ter.charAt(i)+"\t");
+		System.out.println("\n\t----------------------------------");
+		for(i=0;i<var.length();i++)
+		{
+			System.out.print("\n"+var.charAt(i)+"   |\t");
+			for(j=0;j<ter.length();j++)
+				System.out.print(table[i][j]+"\t");
+		}
+		System.out.printf("\n%-20s %-20s\n\n","\n\nSTACK","INPUT");
+		while(true) {
+			for(i=0;i<stack.size();i++)
+				System.out.print(stack.get(i)+" ");
+			if(stack.size()>3)
+				System.out.print("\t");
+			else
+				System.out.printf("\t\t");
+			for(i=ip.size()-1;i>=0;i--)
+				System.out.print(ip.get(i)+" ");
+			System.out.println();
+			c1 = stack.peek().toString().charAt(0);
+			c2 = ip.peek().toString().charAt(0);
+			if( (c1 == c2 && c2 == '$') || (c1 == 'e' && c2 == '$') )
+			{
+				System.out.printf("%-20s\n","Accept!");
+				break;
+			}
+			else if(c1 == c2 && c2 != '$')
+			{
+				try
+				{
+					stack.pop();
+					ip.pop(); 
+				}
+				catch(EmptyStackException e) {}
+			}
+			else if(table[var.indexOf(c1)][ter.indexOf(c2)] != "-")
+			{
+				try
+				{
+					stack.pop(); 
+				}
+				catch(EmptyStackException e) {}
+				value = table[var.indexOf(c1)][ter.indexOf(c2)];
+				for(i = (value.length())-1;i >= 0;i--)
+					stack.push(""+(value.charAt(i)));
+			}
+			else {
+				System.out.println("Error");
+				break;
+			}
+		}
+	}
+}
