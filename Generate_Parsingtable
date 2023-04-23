@@ -1,0 +1,37 @@
+# Example grammar and sets
+grammar = {
+    'S': [['a', 'A'], ['b', 'B']],
+    'A': [['c'], ['d']],
+    'B': [['c'], ['e']]
+}
+
+first_sets = {
+    'S': {'a', 'b'},
+    'A': {'c', 'd'},
+    'B': {'c', 'e'}
+}
+
+follow_sets = {
+    'S': {'$'},
+    'A': {'b'},
+    'B': {'b'}
+}
+
+# Generate the LL(1) parsing table
+table = generate_table(grammar, first_sets, follow_sets)
+
+# Print the LL(1) parsing table
+print("LL(1) Parsing Table:")
+print("{:<10}".format(""), end="")
+for terminal in first_sets['S'] | {'$'}:
+    print("{:<10}".format(terminal), end="")
+print()
+for nonterminal in grammar:
+    print("{:<10}".format(nonterminal), end="")
+    for terminal in first_sets['S'] | {'$'}:
+        if (nonterminal, terminal) in table:
+            production = " ".join(table[(nonterminal, terminal)])
+            print("{:<10}".format(production), end="")
+        else:
+            print("{:<10}".format(""), end="")
+    print()
