@@ -198,3 +198,8 @@ printf("\nNo. of Vowels=%d\nNo. O
 Consonents=%d\n",v,c);
 return 0;
 
+how to run
+
+flex kio.l
+gcc lex.yy.c -o kio.exe
+kio.exe
