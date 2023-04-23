@@ -1,0 +1,60 @@
+import re
+
+keyword = ['import','java','public','int','String','args','else','float','for','if','break','case','char','const','continue','deafult','do','long','return','static','switch','typedef','union','unsigned','void','while']
+built_in_functions = ['System.out.println(','Scanner(','main(','length()']
+operators = ['+','-','*','/','%','==','!=','>','<','>=','<=','&&','||','!','&','|','^','~','>>','<<','=','+=','-=','*=']
+separator = [',',':',';','\n','\t','{','}','(',')','[',']']
+charr = "="
+ 
+file = open('File.txt','r+')
+keywords =[]
+functions = []
+literals = []
+operatorss = []
+separators =[]
+spcl = []
+Literal = []
+identifier = []
+
+contents = file.read()
+splitCode = contents.split()
+length = len(splitCode)      
+for i in range(0,length):
+    if splitCode[i] in keyword:
+        keywords.append(splitCode[i])
+        continue
+    if splitCode[i] in operators:
+        if splitCode[i] == "=":
+         identifier.append(splitCode[i-1]);
+         if re.match(r'^[+-]?[0-9]+$',splitCode[i+1]):
+          Literal.append(splitCode[i+1])
+        operatorss.append(splitCode[i])
+        continue
+    if splitCode[i] in built_in_functions:
+        functions.append(splitCode[i])
+        continue
+    if splitCode[i] in separator:
+        separators.append(splitCode[i])
+        continue
+    if re.match(r"[^\"[.*?]\"]",splitCode[i]):
+        if re.match(r"^[^\d\W]\w*\Z", splitCode[i]):
+            Literal.append(splitCode[i])
+
+print("Literals  :",Literal)
+print("Keywords  :", keywords)
+print("Functions :" ,functions)
+print("Operators :" , operatorss)
+print("Seperator :",separators)
+print("identifier :",identifier)
+
+
+File.txt
+
+class File{
+    public static void main(String args[]){
+        int x = 1;
+        int y = 3;
+        int sum = x*y;
+        System.out.println("Product of two number is : " + sum);
+ }
+}
