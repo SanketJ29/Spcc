@@ -1,0 +1,38 @@
+MDT = []  # Macro Definition Table
+MNT = {}  # Macro Name Table
+ALA = {}  # Argument List Array
+
+# Read MDT, MNT, and ALA from files generated in pass-1
+with open('MDT.txt', 'r') as f:
+    for line in f:
+        MDT.append(line.strip().split())
+        
+with open('MNT.txt', 'r') as f:
+    for line in f:
+        name, index = line.strip().split()
+        MNT[name] = int(index)
+        
+with open('ALA.txt', 'r') as f:
+    for line in f:
+        index, arg = line.strip().split()
+        ALA[int(index)] = arg
+
+# Read input file
+with open('input.txt', 'r') as f:
+    for line in f:
+        line = line.strip()
+        if line in MNT:  # Macro call
+            mdt_index = MNT[line]
+            ala_index = 1
+            for i in range(mdt_index, len(MDT)):
+                card = MDT[i]
+                if card[0] == 'MEND':
+                    break
+                for j in range(1, len(card)):
+                    if card[j][0] == '&':
+                        card[j] = ALA[int(card[j][1:])]
+                    else:
+                        card[j] = card[j]
+                print('\t'.join(card))
+        else:  # Non-macro instruction
+            print(line)
