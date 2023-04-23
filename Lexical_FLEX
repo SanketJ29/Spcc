@@ -38,20 +38,27 @@ COUNT WORDS
 
 %{
 #include<stdio.h>
-int sc=0,wc=0,1c=0,cc=0; %} %%
-[\n] { lc++; cc+=yyleng;} [ \t] { sc++; cc+=yyleng;}
-[^\t\n ]+ { wc++; cc+=yyleng;} %%
-int main(int argc, char* argv[]) {
-if (argc > 1) {
-FILE *file;
-file = fopen(argv[1], "r");
-if (!file) {
-fprintf(stderr, "Could not open %s\n", argv[1]);
-exit(1); }
-yyin = file;
-yylex();
-printf("The number of lines=%d\n",lc);
-printf("The number of spaces=%d\n",sc);
+int w=0,c=0,l=0,s=0;
+%}
+%%
+{
+	\n l++;
+	[^ \t\n]+ {w++;c+=yyleng;}
+	" " s++;
+	\t s+=5;
+}
+%%
+int yywrap()
+{
+  return 1;
+}
+void main()
+{
+	printf("Enter a string : ");
+	yylex();
+	printf("\nWords = %d, Characters = %d, Lines = %d & Spaces = %d\n",w,c,l,s);
+}
+
 
 
 COUNT NO. of KEYWORDS, IDENTIFIERS and OPERATOR
@@ -90,4 +97,104 @@ printf("Keywords: %d\nIndentifiers:
 %d\n",keywords,identifiers,operators);
 return 0;
 }
+
+C file for this:
+int main() {
+   int a = 10;
+   int b = 20;
+   int c = a + b;
+   printf("Sum of %d and %d is %d\n", a, b, c);
+   return 0;
+}
+
+
+VERBS, ADJECTIVES
+
+%{
+#include <stdio.h>
+#include <string.h>
+int v_count = 0;
+int n_count = 0;
+int adv_count = 0;
+int adj_count = 0;
+%}
+%x v_token
+%x n_token
+%x adj_token
+%x adv_token
+%%
+"run" {
+V_count++;
+BEGIN(v_token);
+}
+"dog"|"book"|"computer"|"music"|"food"|"tel
+evision"|"tree"|"house"|"car"|"phone"|"desk"
+|"chair"|"water"|"person"|"table"|"road"|"oc
+ean"|"river"|"flower"|"money" {
+n_count++;
+BEGIN(n_token);
+}
+"happy"|"sad"|"big"|"small"|"fast"|"slow"|"ho
+t"|"cold"|"happy"|"angry"|"pretty"|"ugly"|"bri
+ght"|"dark"|"long"|"short"|"heavy"|"light"|"s
+weet"|"sour" {
+adj_count++;
+BEGIN(adj_token);
+}
+"quickly"|"slowly"|"loudly"|"softly"|"happily"|
+"sadly"|"smoothly"|"roughly" {
+adv_count++;
+BEGIN(adv_token);
+}
+<v_token>.|\n { BEGIN(INITIAL);}
+<n_token>.|\n { BEGIN(INITIAL);}
+<adv_token>.|\n { BEGIN(INITIAL);}
+<adj_token>.|\n { BEGIN(INITIAL);}
+%%
+int yywrap(){}
+int main(int argc, char *argv[]){
+yylex();
+printf("number of verbs: %d\n", v_count);
+printf("number of nouns: %d\n", n_count);
+printf("number of adjectives: %d\n",
+adj_count);
+printf("number of adverbs: %d\n", adv_count);
+return 0;
+}
+
+
+EVEN AND ODD
+
+%{
+#include<stdio.h>
+int i;
+%}
+[0-9]+ {i=atoi(yytext);
+if(i%2==0)
+printf("Even");
+else
+printf("Odd");}
+%%
+int yywrap(){}
+int main() {
+yylex();
+return 0;
+
+COUNT VOWELS AND CONSONANTS
+
+%{
+#include<stdio.h> int v=0,c=0;
+%}
+%%
+[aeioUAEIOU] [a-zA-Z]
+%%
+int yywrap(void) {
+return 1;
+}
+int main() {
+printf("Enter the Text:" );
+yylex();
+printf("\nNo. of Vowels=%d\nNo. O
+Consonents=%d\n",v,c);
+return 0;
 
